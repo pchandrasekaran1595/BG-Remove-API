@@ -57,7 +57,9 @@ async def clean(request: Request) -> JSONResponse:
     )
 
 
-@app.route("/remove/<model_type:str>", methods=["GET", "POST"], name="Background Removal")
+@app.route(
+    "/remove/<model_type:str>", methods=["GET", "POST"], name="Background Removal"
+)
 async def remove(request: Request, model_type: str) -> JSONResponse:
     """
     BASH
@@ -108,13 +110,13 @@ async def remove(request: Request, model_type: str) -> JSONResponse:
 
         if "rtype" in request.args:
             rtype = request.args.get("rtype")
-        
+
         if rtype != "file" and rtype != "json":
             return JSONResponse(
                 body={"statusText": "Invalid Return Type Specified"}, status=400
             )
 
-        image = Processor().decode_image(request.files.get("file").body)
+        image = Processor.decode_image(request.files.get("file").body)
         if model_type == "n":
             mask = await models[0].infer(image)
         else:
@@ -144,7 +146,11 @@ async def remove(request: Request, model_type: str) -> JSONResponse:
             )
 
 
-@app.route("/replace/color/<model_type:str>", methods=["GET", "POST"], name="Background Color Replacement")
+@app.route(
+    "/replace/color/<model_type:str>",
+    methods=["GET", "POST"],
+    name="Background Color Replacement",
+)
 async def replace_color(request: Request, model_type: str) -> JSONResponse:
     """
     BASH
@@ -171,11 +177,11 @@ async def replace_color(request: Request, model_type: str) -> JSONResponse:
 
         if "fill" in request.args:
             fill = request.args.get("fill")
-        
+
         if rtype != "file" and rtype != "json":
             return JSONResponse(
                 body={"statusText": "Invalid Return Type Specified"}, status=400
-            )  
+            )
 
         fill = fill.replace(" ", "").split(",")
         if len(fill) != 1 and len(fill) != 4:
@@ -210,7 +216,7 @@ async def replace_color(request: Request, model_type: str) -> JSONResponse:
 
         if "fill" in request.args:
             fill = request.args.get("fill")
-        
+
         if rtype != "file" and rtype != "json":
             return JSONResponse(
                 body={"statusText": "Invalid Return Type Specified"}, status=400
@@ -224,26 +230,21 @@ async def replace_color(request: Request, model_type: str) -> JSONResponse:
 
         color: tuple = ()
         if len(fill) == 1:
-            color = (
-                int(fill[0]) % 256,
-                int(fill[0]) % 256,
-                int(fill[0]) % 256,
-                255
-            )
+            color = (int(fill[0]) % 256, int(fill[0]) % 256, int(fill[0]) % 256, 255)
         else:
             color = (
                 int(fill[0]) % 256,
                 int(fill[1]) % 256,
                 int(fill[2]) % 256,
-                int(fill[0]) % 256
+                int(fill[0]) % 256,
             )
 
-        image = Processor().decode_image(request.files.get("file").body)
+        image = Processor.decode_image(request.files.get("file").body)
         if model_type == "n":
             mask = await models[0].infer(image)
         else:
             mask = await models[1].infer(image)
-        
+
         image = Processor.get_bg_color_replaced_image(image, mask, color)
 
         if rtype == "json":
@@ -269,7 +270,11 @@ async def replace_color(request: Request, model_type: str) -> JSONResponse:
             )
 
 
-@app.route("/replace/image/<model_type:str>", methods=["GET", "POST"], name="Background Image Replacement")
+@app.route(
+    "/replace/image/<model_type:str>",
+    methods=["GET", "POST"],
+    name="Background Image Replacement",
+)
 async def replace_image(request: Request, model_type: str) -> JSONResponse:
     """
     BASH
@@ -292,11 +297,11 @@ async def replace_image(request: Request, model_type: str) -> JSONResponse:
 
         if "rtype" in request.args:
             rtype = request.args.get("rtype")
-        
+
         if rtype != "file" and rtype != "json":
             return JSONResponse(
                 body={"statusText": "Invalid Return Type Specified"}, status=400
-            )  
+            )
 
         return JSONResponse(
             body={
@@ -319,11 +324,19 @@ async def replace_image(request: Request, model_type: str) -> JSONResponse:
                 body={"statusText": "Invalid Key Specified for file1 Upload"},
                 status=400,
             )
-        
+
         if request.files.get("file2", None) is None:
             return JSONResponse(
                 body={"statusText": "Invalid Key Specified for file2 Upload"},
                 status=400,
+            )
+
+        if "rtype" in request.args:
+            rtype = request.args.get("rtype")
+
+        if rtype != "file" and rtype != "json":
+            return JSONResponse(
+                body={"statusText": "Invalid Return Type Specified"}, status=400
             )
 
         filename_1: str = request.files.get("file1").name
@@ -346,6 +359,7 @@ async def replace_image(request: Request, model_type: str) -> JSONResponse:
         image_2 += image_1
 
         if rtype == "json":
+            print("HERE")
             return JSONResponse(
                 body={
                     "statusText": "Background Replacement Successful",
@@ -359,7 +373,7 @@ async def replace_image(request: Request, model_type: str) -> JSONResponse:
             Processor.write_to_temp(
                 image_2,
                 f"TEMP/{filename_1.split('.')[0]}_{filename_2.split('.')[0]}_{token}.png",
-                False
+                False,
             )
             return await file(
                 location=f"TEMP/{filename_1.split('.')[0]}_{filename_2.split('.')[0]}_{token}.png",

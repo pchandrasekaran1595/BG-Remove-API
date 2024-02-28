@@ -8,7 +8,6 @@ import onnxruntime as ort
 from PIL import Image
 
 import warnings
-
 warnings.filterwarnings("ignore")
 
 ort.set_default_logger_severity(3)
@@ -67,7 +66,6 @@ class Processor:
             image = cv2.cvtColor(src=image, code=cv2.COLOR_RGBA2BGRA)
         else:
             image = cv2.cvtColor(src=image, code=cv2.COLOR_RGB2BGR)
-        print(image.shape)
         _, imageData = cv2.imencode(".png", image)
         imageData = base64.b64encode(imageData)
         imageData = str(imageData).replace("b'", "").replace("'", "")
