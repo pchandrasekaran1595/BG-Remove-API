@@ -14,19 +14,13 @@ def test_get_root():
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("mode", ["remove", "replace"])
-def test_get_processing(mode: str):
-    _, response = test_client.get(f"/{mode}")
+@pytest.mark.parametrize(
+    ["model_type", "rtype"],
+    [("n", "file"), ("lw", "file"), ("n", "json"), ("lw", "json")],
+)
+def test_get_remove_correct(model_type: str, rtype: str):
+    _, response = test_client.get(f"/remove/{model_type}?rtype={rtype}")
     assert response.json == {
-        "statusText": f"{mode.title()} endpoint of BG-Remove-API",
-    }
-    assert response.status_code == 200
-
-
-@pytest.mark.parametrize("mode", ["remove", "replace"])
-def test_get_processing_li(mode: str):
-    _, response = test_client.get(f"/{mode}/li")
-    assert response.json == {
-        "statusText": f"{mode.title()} lightweight endpoint of BG-Remove-API",
+        "statusText": f"Background Removal Endpoint (Return Type : {rtype})",
     }
     assert response.status_code == 200

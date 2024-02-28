@@ -78,11 +78,6 @@ async def remove(request: Request, model_type: str) -> JSONResponse:
                 status=200,
             )
 
-        if len(request.args) == 0:
-            return JSONResponse(
-                body={"statusText": "Background Removal Endpoint"}, status=200
-            )
-
         if "rtype" in request.args:
             rtype = request.args.get("rtype")
 
