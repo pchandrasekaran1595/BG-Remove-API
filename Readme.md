@@ -8,11 +8,12 @@ Contains the Background Removal/Replacement API and Python Client
 
 **1. API Endpoints**
 
-- `/remove`
-- `/remove/li`
-- `/replace`
-- `/replace/li`
-- Query Parameters: `rtype` (Can be either `file` or `json`) 
+- `/remove/n` 
+- `/remove/lw`
+- `/replace/color/n`
+- `/replace/color/lw`
+- `/replace/image/n`
+- `/replace/image/lw`
 
 <br>
 
